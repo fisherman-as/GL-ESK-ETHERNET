@@ -1,3 +1,4 @@
+/*
 #include "simple_http_server.h"
 #include "main.h"
 #include "lwip.h"
@@ -198,3 +199,103 @@ void ServerThread(void const * argument)
 
 		osThreadTerminate(NULL);
 }
+*/
+
+#include "simple_http_server.h"
+#include "main.h"
+#include "lwip.h"
+#include "sockets.h"
+#include "cmsis_os.h"
+#include <string.h>
+
+#define PORTNUM 5678UL
+
+#if (USE_UDP_SERVER_PRINTF == 1)
+#include <stdio.h>
+#define UDP_SERVER_PRINTF(...) do { printf("[udp_server.c: %s: %d]: ",__func__, __LINE__);printf(__VA_ARGS__); } while (0)
+#else
+#define UDP_SERVER_PRINTF(...)
+#endif
+
+static struct sockaddr_in serv_addr, client_addr;
+static int socket_fd;
+static uint16_t nport;
+
+static int udpServerInit(void)
+{
+	socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket_fd == -1) {
+		UDP_SERVER_PRINTF("socket() error\n");
+		return -1;
+	}
+
+	nport = PORTNUM;
+	nport = htons((uint16_t)nport);
+
+	bzero(&serv_addr, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = nport;
+
+	if(bind(socket_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))==-1) {
+		UDP_SERVER_PRINTF("bind() error\n");
+		close(socket_fd);
+		return -1;
+	}
+
+	UDP_SERVER_PRINTF("Server is ready\n");
+
+	return 0;
+}
+
+void StartUdpServerTask(void const * argument)
+{
+	//int addr_len;
+	//size_t i = 0;
+
+	osDelay(5000);// wait 5 sec to init lwip stack
+
+	if(udpServerInit() < 0) {
+		UDP_SERVER_PRINTF("udpSocketServerInit() error\n");
+		osThreadTerminate(NULL);
+		//return;
+	}
+
+	for(;;)
+	{
+	  bzero(&client_addr, sizeof(client_addr));
+	  //addr_len = sizeof(client_addr);
+
+	  int nbytes;
+	  const size_t buf_len=256;
+	  char buffer[buf_len];
+	  memset(buffer, 8, buf_len);
+	  socklen_t addrlen = sizeof(client_addr);
+
+	  while ( (nbytes = recvfrom(socket_fd, buffer, (size_t)sizeof(buffer),
+			  0, (struct sockaddr *)&client_addr, (socklen_t*)&addrlen)) > 0 )
+	  {
+		if (strncmp(buffer, "exit", strlen("exit")) == 0)
+		{
+			sendto(socket_fd, "goodbye!", strlen("goodbye!"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			break;
+		}
+		if (sendto(socket_fd, buffer, nbytes, 0, (const struct sockaddr*)&client_addr, addrlen) < 0)
+		{
+			UDP_SERVER_PRINTF("send() error\n");
+		}
+	  }
+			close(socket_fd);
+	}
+}
+
+
+
+
+
+
+
+
+
+

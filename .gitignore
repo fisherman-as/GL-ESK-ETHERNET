@@ -37,3 +37,4 @@ build
 
 *.list
 *.map
+/.metadata/
