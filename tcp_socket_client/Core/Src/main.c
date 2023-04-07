@@ -291,7 +291,7 @@ int main(void)
    * please, add 'pu addcarreturn Yes' to the file ~/.minirc.dfl
    * to attach '\r' after '\n'
    * */
-  printf("USART3 initialized\n");
+  printf("USART3 initialized\n\r");
   NVIC_SetPriorityGrouping(0);
 
   lcd_init();

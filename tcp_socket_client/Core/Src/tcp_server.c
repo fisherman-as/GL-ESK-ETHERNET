@@ -15,7 +15,7 @@
 
 #if (USE_TCP_SERVER_PRINTF == 1)
 #include <stdio.h>
-#define TCP_SERVER_PRINTF(...) do { printf("[tcp_server.c: %s: %d]: ",__func__, __LINE__);printf(__VA_ARGS__); } while (0)
+#define TCP_SERVER_PRINTF(...) do { printf("[tcp_server.c: %s: %d]: \r\n",__func__, __LINE__);printf(__VA_ARGS__); } while (0)
 #else
 #define TCP_SERVER_PRINTF(...)
 #endif
