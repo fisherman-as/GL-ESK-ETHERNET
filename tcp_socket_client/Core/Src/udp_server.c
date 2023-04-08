@@ -2,6 +2,7 @@
  * UDP server
  * was written by Aleksey Yabanzhi
  * with help of Petro Shevchenko
+ * and Artem Dovhal
  * 07.04.2023
  */
 #include "simple_http_server.h"
@@ -105,29 +106,35 @@ void StartUdpServerTask(void const * argument)
 			{
 				if (strcmp(Command[1], "on") == 0)
 				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "off") == 0)
 				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "toggle") == 0)
 				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "status") == 0)
 				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_12);
+					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_13);
 					if (pinState==GPIO_PIN_SET)
-					{sendto(socket_fd, "led3 ON\nOK\n", strlen("led3 ON\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led3 ON\r\n", strlen("led3 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 					else if (pinState==GPIO_PIN_RESET)
-					{sendto(socket_fd, "led3 OFF\nOK\n", strlen("led3 OFF\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led3 OFF\r\n", strlen("led3 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 				}
 				else
-				{sendto(socket_fd, "ERROR\n", strlen("ERROR\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
 			continue;
 			}
 //led4
@@ -135,29 +142,35 @@ void StartUdpServerTask(void const * argument)
 			{
 				if (strcmp(Command[1], "on") == 0)
 				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "off") == 0)
 				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "toggle") == 0)
 				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "status") == 0)
 				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_13);
+					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_12);
 					if (pinState==GPIO_PIN_SET)
-					{sendto(socket_fd, "led4 ON\nOK\n", strlen("led34 ON\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led4 ON\r\n", strlen("led34 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 					else if (pinState==GPIO_PIN_RESET)
-					{sendto(socket_fd, "led4 OFF\nOK\n", strlen("led4 OFF\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led4 OFF\r\n", strlen("led4 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 				}
 				else
-				{sendto(socket_fd, "ERROR\n", strlen("ERROR\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
 			continue;
 			}
 //led5
@@ -166,28 +179,34 @@ void StartUdpServerTask(void const * argument)
 				if (strcmp(Command[1], "on") == 0)
 				{
 					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "off") == 0)
 				{
 					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "toggle") == 0)
 				{
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "status") == 0)
 				{
 					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_14);
 					if (pinState==GPIO_PIN_SET)
-					{sendto(socket_fd, "led5 ON\nOK\n", strlen("led5 ON\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led5 ON\r\n", strlen("led5 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 					else if (pinState==GPIO_PIN_RESET)
-					{sendto(socket_fd, "led5 OFF\nOK\n", strlen("led5 OFF\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led5 OFF\r\n", strlen("led5 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 				}
 				else
-				{sendto(socket_fd, "ERROR\n", strlen("ERROR\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
 			continue;
 			}
 //led6
@@ -196,28 +215,34 @@ void StartUdpServerTask(void const * argument)
 				if (strcmp(Command[1], "on") == 0)
 				{
 					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "off") == 0)
 				{
 					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "toggle") == 0)
 				{
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
-					sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
 				}
 				else if (strcmp(Command[1], "status") == 0)
 				{
 					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_15);
 					if (pinState==GPIO_PIN_SET)
-					{sendto(socket_fd, "led6 ON\nOK\n", strlen("led6 ON\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led6 ON\r\n", strlen("led6 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 					else if (pinState==GPIO_PIN_RESET)
-					{sendto(socket_fd, "led6 OFF\nOK\n", strlen("led6 OFF\nOK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+					{
+						sendto(socket_fd, "led6 OFF\r\n", strlen("led6 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+					}
 				}
 				else
-				{sendto(socket_fd, "ERROR\n", strlen("ERROR\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
+				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
 			continue;
 			}
 		}

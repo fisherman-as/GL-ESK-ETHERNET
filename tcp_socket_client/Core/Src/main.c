@@ -641,7 +641,7 @@ void StartDefaultTask(void const * argument)
 		  lcd_puts(msg);
 	  }
 
-	  BSP_LED_Toggle(BLUE);
+	  //BSP_LED_Toggle(BLUE);
 	  osDelay(1000);
   }
   /* USER CODE END 5 */
