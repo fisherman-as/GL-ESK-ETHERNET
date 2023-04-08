@@ -29,7 +29,7 @@ static uint16_t nport;
 void Clear(char buffer[], size_t buf_len)
 {
 	for (uint32_t i=0; i<buf_len; i++)
-		{buffer[i]=' ';}
+		{buffer[i]='\n';}
 }
 static int udpServerInit(void)
 {
@@ -74,6 +74,8 @@ void StartUdpServerTask(void const * argument)
 	  int nbytes;
 	  const size_t buf_len=256;
 	  char buffer[buf_len];
+		for (uint32_t i=0; i<buf_len; i++)
+			{buffer[i]='0';}
 	  memset(buffer, 8, buf_len);
 	  socklen_t addrlen = sizeof(client_addr);
 
@@ -82,179 +84,165 @@ void StartUdpServerTask(void const * argument)
 	  {
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //exit
-		  if (strncmp(buffer, "exit", strlen("exit")) == 0)
+		if (strncmp(buffer, "exit", strlen("exit")) == 0)
 		{
 			sendto(socket_fd, "goodbye, my friend!", strlen("goodbye, my friend!"), 0, (const struct sockaddr*)&client_addr, addrlen);
 			break;
 		}
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //sversion
-		  if (strncmp(buffer, "sversion", strlen("sversion")) == 0)
+		else if (strncmp(buffer, "sversion", strlen("sversion")) == 0)
 		{
 			sendto(socket_fd, VERSION, strlen(VERSION), 0, (const struct sockaddr*)&client_addr, addrlen);
 			sendto(socket_fd, "OK\n", strlen("OK\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-			Clear(buffer, buf_len);
 		    continue;
 		}
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-		{
-			/*---------------------------------Here we break the buffer into two different words-------------------------*/
-			char* Command[2]={0};
-			char* pvCommand = strtok(buffer, " "); //the first command (led<n>) has to finish by SPACE
-			Command[0] = pvCommand;
-			pvCommand = strtok(NULL, " "); //the second command (on, off) has to finish by ENTER
-			Command[1] = pvCommand;
-			/*-----Now we have the first part of command in Command[0] and the second part of command in Command[1]------*/
 
 //led3
-			if (strcmp(Command[0], "led3") == 0)
-			{
-				if (strncmp(Command[1], "on",sizeof("on")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "off",sizeof("off")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "toggle",sizeof("toggle")) == 0)
-				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "status",sizeof("status")) == 0)
-				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_13);
-					if (pinState==GPIO_PIN_SET)
-					{
-						sendto(socket_fd, "led3 ON\r\n", strlen("led3 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-					else if (pinState==GPIO_PIN_RESET)
-					{
-						sendto(socket_fd, "led3 OFF\r\n", strlen("led3 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-				}
-				else
-				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
-				Clear(buffer, buf_len);
-			    continue;
-			}
-//led4
-			if (strcmp(Command[0], "led4") == 0)
-			{
-				if (strncmp(Command[1], "on",sizeof("on")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "off",sizeof("off")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "toggle",sizeof("toggle")) == 0)
-				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "status",sizeof("status")) == 0)
-				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_12);
-					if (pinState==GPIO_PIN_SET)
-					{
-						sendto(socket_fd, "led4 ON\r\n", strlen("led34 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-					else if (pinState==GPIO_PIN_RESET)
-					{
-						sendto(socket_fd, "led4 OFF\r\n", strlen("led4 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-				}
-				else
-				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
-				Clear(buffer, buf_len);
-			    continue;
-			}
-//led5
-			if (strcmp(Command[0], "led5") == 0)
-			{
-				if (strncmp(Command[1], "on",sizeof("on")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "off",sizeof("off")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "toggle",sizeof("toggle")) == 0)
-				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "status",sizeof("status")) == 0)
-				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_14);
-					if (pinState==GPIO_PIN_SET)
-					{
-						sendto(socket_fd, "led5 ON\r\n", strlen("led5 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-					else if (pinState==GPIO_PIN_RESET)
-					{
-						sendto(socket_fd, "led5 OFF\r\n", strlen("led5 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-				}
-				else
-				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
-				Clear(buffer, buf_len);
-				continue;
-			}
-//led6
-			if (strcmp(Command[0], "led6") == 0)
-			{
-				if (strncmp(Command[1], "on",sizeof("on")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "off",sizeof("off")) == 0)
-				{
-					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "toggle",sizeof("toggle")) == 0)
-				{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
-					sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-				}
-				else if (strncmp(Command[1], "status",sizeof("status")) == 0)
-				{
-					GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_15);
-					if (pinState==GPIO_PIN_SET)
-					{
-						sendto(socket_fd, "led6 ON\r\n", strlen("led6 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-					else if (pinState==GPIO_PIN_RESET)
-					{
-						sendto(socket_fd, "led6 OFF\r\n", strlen("led6 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-						sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
-					}
-				}
-				else
-				{sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);}
-				Clear(buffer, buf_len);
-				continue;
-			}
+		else if (strncmp(buffer, "led3 on",strlen("led3 on")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
 		}
+		else if (strncmp(buffer, "led3 off",strlen("led3 off")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led3 toggle",strlen("led3 toggle")) == 0)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led3 status",strlen("led3 status")) == 0)
+		{
+			GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_13);
+			if (pinState==GPIO_PIN_SET)
+			{
+				sendto(socket_fd, "LED3 ON\r\n", strlen("LED3 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			else if (pinState==GPIO_PIN_RESET)
+			{
+				sendto(socket_fd, "LED3 OFF\r\n", strlen("LED3 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			continue;
+		}
+
+//led4
+		else if (strncmp(buffer, "led4 on", strlen("led4 on")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led4 off", strlen("led4 off")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led4 toggle", strlen("led4 toggle")) == 0)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led4 status", strlen("led4 status")) == 0)
+		{
+			GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_12);
+			if (pinState==GPIO_PIN_SET)
+			{
+				sendto(socket_fd, "LED4 ON\r\n", strlen("LED4 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			else if (pinState==GPIO_PIN_RESET)
+			{
+				sendto(socket_fd, "LED4 OFF\r\n", strlen("LED4 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			continue;
+		}
+
+//led5
+		else if (strncmp(buffer, "led5 on", strlen("led5 on")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led5 off", strlen("led5 off")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led5 toggle", strlen("led5 toggle")) == 0)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led5 status", strlen("led5 status")) == 0)
+		{
+			GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_14);
+			if (pinState==GPIO_PIN_SET)
+			{
+				sendto(socket_fd, "LED5 ON\r\n", strlen("LED5 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			else if (pinState==GPIO_PIN_RESET)
+			{
+				sendto(socket_fd, "LED5 OFF\r\n", strlen("LED5 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			continue;
+		}
+
+//led6
+		else if (strncmp(buffer, "led6 on", strlen("led6 on")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led6 off", strlen("led6 off")) == 0)
+		{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led6 toggle", strlen("led6 toggle")) == 0)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
+			sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			continue;
+		}
+		else if (strncmp(buffer, "led6 status", strlen("led6 status")) == 0)
+		{
+			GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_15);
+			if (pinState==GPIO_PIN_SET)
+			{
+				sendto(socket_fd, "LED6 ON\r\n", strlen("LED6 ON\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			else if (pinState==GPIO_PIN_RESET)
+			{
+				sendto(socket_fd, "LED6 OFF\r\n", strlen("LED6 OFF\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+				sendto(socket_fd, "OK\r\n", strlen("OK\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+			}
+			continue;
+		}
+		else
+		  {
+			sendto(socket_fd, "ERROR\r\n", strlen("ERROR\r\n"), 0, (const struct sockaddr*)&client_addr, addrlen);
+		  }
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //echo
 		if (sendto(socket_fd, buffer, nbytes, 0, (const struct sockaddr*)&client_addr, addrlen) < 0)
